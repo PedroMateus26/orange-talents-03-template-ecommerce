@@ -1,5 +1,9 @@
 package com.pedromateus.zupacadey.MercadoLivre.usuario;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -8,10 +12,15 @@ import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PastOrPresent;
 import java.time.Instant;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
-public class Usuario {
+public class Usuario implements UserDetails {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,8 +31,19 @@ public class Usuario {
     @NotBlank
     @Column(nullable = false)
     private String senha;
-    @Column(nullable = false)
-    private Instant createdAt;
+    @PastOrPresent
+    @CreationTimestamp
+    private Instant createdAt=Instant.now();
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "usuarios_perfis",
+            joinColumns = @JoinColumn(name = "usuario_id"),
+            inverseJoinColumns = @JoinColumn(name = "perfis_id")
+    )
+    private Set<Perfil> perfis=new HashSet<>();
+
+    public Usuario() {
+    }
 
     public Usuario(@Email @NotBlank String email, @NotBlank String senha) {
 
@@ -47,8 +67,39 @@ public class Usuario {
         return senha;
     }
 
-    @PrePersist
-    public void prePersist(){
-        this.createdAt=Instant.now();
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return perfis.stream().map(perfil -> new SimpleGrantedAuthority(perfil.getPerfil()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public String getPassword() {
+        return this.senha;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }
