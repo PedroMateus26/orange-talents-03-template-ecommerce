@@ -23,7 +23,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
     private TokenStore tokenStore;
 
     private static final String[] PUBLIC={"/oauth/token", "/h2-console/**"};
-    private static final String[] USUARIO={"/users/**"};
+    private static final String[] USUARIO={"/users/**","/products/**"};
 
     @Override
     public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
@@ -38,7 +38,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 
         http.authorizeRequests()
                 .antMatchers(PUBLIC).permitAll()
-                .antMatchers(HttpMethod.GET,USUARIO)
+                .antMatchers(USUARIO)
                 .hasRole("USUARIO")
                 .anyRequest().authenticated();
 
