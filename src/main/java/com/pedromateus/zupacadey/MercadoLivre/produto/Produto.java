@@ -4,6 +4,8 @@ import com.pedromateus.zupacadey.MercadoLivre.produto.caracteristica.Caracterist
 import com.pedromateus.zupacadey.MercadoLivre.produto.imagens.ImagensProduto;
 import com.pedromateus.zupacadey.MercadoLivre.produto.opiniao.Opiniao;
 import com.pedromateus.zupacadey.MercadoLivre.produto.opiniao.OpiniaoRequestDTO;
+import com.pedromateus.zupacadey.MercadoLivre.produto.perguntas.Pergunta;
+import com.pedromateus.zupacadey.MercadoLivre.produto.perguntas.PerguntasRequestDTO;
 import com.pedromateus.zupacadey.MercadoLivre.usuario.Usuario;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.LazyCollection;
@@ -41,6 +43,9 @@ public class Produto {
 
     @OneToMany(cascade = CascadeType.ALL)
     private List<Opiniao> opinioes= new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Pergunta> perguntas=new ArrayList<>();
 
 
 
@@ -106,6 +111,15 @@ public class Produto {
                 this
         );
         this.opinioes.add(opiniao);
+    }
+
+    public void addPergunta(PerguntasRequestDTO perguntaRequestDTO, Usuario usuarioDaOpiniao){
+        Pergunta pergunta= new Pergunta(
+                perguntaRequestDTO.getTitulo(),
+                usuarioDaOpiniao,
+                this
+        );
+        this.perguntas.add(pergunta);
     }
 
 }

@@ -3,6 +3,7 @@ package com.pedromateus.zupacadey.MercadoLivre.produto;
 import com.pedromateus.zupacadey.MercadoLivre.produto.imagens.ImagensProdutoRequestDTO;
 import com.pedromateus.zupacadey.MercadoLivre.produto.opiniao.Opiniao;
 import com.pedromateus.zupacadey.MercadoLivre.produto.opiniao.OpiniaoRequestDTO;
+import com.pedromateus.zupacadey.MercadoLivre.produto.perguntas.PerguntasRequestDTO;
 import com.pedromateus.zupacadey.MercadoLivre.usuario.UserService;
 import com.pedromateus.zupacadey.MercadoLivre.usuario.Usuario;
 import org.hibernate.annotations.LazyCollection;
@@ -64,5 +65,19 @@ public class ProdutoController {
 
     }
 
+    @Transactional
+    @PostMapping("/{id}/perguntas")
+    public ResponseEntity<?> inserirPergunta(@Valid @RequestBody PerguntasRequestDTO pergutasRequestDTO, @PathVariable Long id){
+        Usuario usuario= userService.usuarioLogado();
+        Long idProduto = id;
+        Produto produto=repository.findById(idProduto).orElseThrow(()->new EntityNotFoundException("Produto não encontrado"));
+        if(usuario!=null){
+            produto.addPergunta(pergutasRequestDTO,usuario);
+            produto= repository.save(produto);
+            return ResponseEntity.ok().body(pergutasRequestDTO);
+        }else{
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
 
+    }
 }
