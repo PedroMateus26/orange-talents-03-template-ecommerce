@@ -14,6 +14,7 @@ public class BeansConfig {
         return new BCryptPasswordEncoder();
     }
 
+
     @Bean
     public JwtAccessTokenConverter accessTokenConverter() {
         JwtAccessTokenConverter tokenConverter = new JwtAccessTokenConverter();

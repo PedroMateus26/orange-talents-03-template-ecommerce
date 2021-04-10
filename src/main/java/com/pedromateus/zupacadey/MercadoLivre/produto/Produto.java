@@ -1,49 +1,50 @@
 package com.pedromateus.zupacadey.MercadoLivre.produto;
 
-import com.pedromateus.zupacadey.MercadoLivre.categoria.Categoria;
+import com.pedromateus.zupacadey.MercadoLivre.produto.caracteristica.CaracteristicasProduto;
+import com.pedromateus.zupacadey.MercadoLivre.produto.imagens.ImagensProduto;
+import com.pedromateus.zupacadey.MercadoLivre.usuario.Usuario;
 import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.lang.NonNull;
 
 import javax.persistence.*;
-import javax.validation.constraints.*;
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 public class Produto {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-
     private String nome;
-
     private BigDecimal valor;
-
     private Integer quantidade;
-
     private String descricao;
+
+    @ManyToOne
+    private Usuario usuario;
+
+    private Long categoriaId;
 
     @CreationTimestamp
     private Instant createdAt=Instant.now();
 
-    @ElementCollection
-    private Set<String> caracteristicas=new HashSet<>();
+    @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    private Set<CaracteristicasProduto> caracteristicas=new HashSet<>();
 
-    private Long categoriaId;
+    @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    private List<ImagensProduto> imagens=new ArrayList<>();
+
+
 
     public Produto() {
     }
 
-    public Produto(String nome, BigDecimal valor, Integer quantidade, String descricao, Set<String> caracteristicas, Long categoriaId) {
+    public Produto(String nome, BigDecimal valor, Integer quantidade, String descricao, Usuario usuario, Set<CaracteristicasProduto> caracteristicas, Long categoriaId) {
         this.nome = nome;
         this.valor = valor;
         this.quantidade = quantidade;
         this.descricao = descricao;
+        this.usuario = usuario;
         this.caracteristicas = caracteristicas;
         this.categoriaId = categoriaId;
     }
@@ -68,11 +69,24 @@ public class Produto {
         return descricao;
     }
 
-    public Set<String> getCaracteristicas() {
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public Set<CaracteristicasProduto> getCaracteristicas() {
         return caracteristicas;
     }
 
     public Long getCategoriaId() {
         return categoriaId;
     }
+
+    public List<ImagensProduto> getImagens() {
+        return imagens;
+    }
+
+    public void addImagens(List<ImagensProduto> imagem) {
+        imagens.addAll(imagem);
+    }
+
 }
