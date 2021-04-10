@@ -4,8 +4,8 @@ import com.pedromateus.zupacadey.MercadoLivre.categoria.Categoria;
 import com.pedromateus.zupacadey.MercadoLivre.produto.caracteristica.CaracteristicasProduto;
 import com.pedromateus.zupacadey.MercadoLivre.produto.imagens.ImagensProduto;
 import com.pedromateus.zupacadey.MercadoLivre.produto.imagens.ImagensProdutoRequestDTO;
+import com.pedromateus.zupacadey.MercadoLivre.usuario.UserService;
 import com.pedromateus.zupacadey.MercadoLivre.usuario.Usuario;
-import com.pedromateus.zupacadey.MercadoLivre.usuario.BuscaUsuarioLogado;
 import com.pedromateus.zupacadey.MercadoLivre.validations.ExistIdValid;
 import com.pedromateus.zupacadey.MercadoLivre.validations.UniqueValueValid;
 
@@ -77,8 +77,8 @@ public class ProdutoRequestDTO {
     }
 
 
-    public Produto convertToProduct(BuscaUsuarioLogado buscaUsuarioLogado) {
-        Usuario usuario= buscaUsuarioLogado.usuarioLogado();
+    public Produto convertToProduct(UserService userService) {
+        Usuario usuario= userService.usuarioLogado();
         return new Produto(
                 this.nome,
                 this.valor,

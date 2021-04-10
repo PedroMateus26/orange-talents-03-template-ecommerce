@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 @Component
-public class BuscaUsuarioLogado implements UserDetailsService {
+public class UserService implements UserDetailsService {
 
     @Autowired
     private UsuarioRepository repository;

@@ -2,8 +2,12 @@ package com.pedromateus.zupacadey.MercadoLivre.produto;
 
 import com.pedromateus.zupacadey.MercadoLivre.produto.caracteristica.CaracteristicasProduto;
 import com.pedromateus.zupacadey.MercadoLivre.produto.imagens.ImagensProduto;
+import com.pedromateus.zupacadey.MercadoLivre.produto.opiniao.Opiniao;
+import com.pedromateus.zupacadey.MercadoLivre.produto.opiniao.OpiniaoRequestDTO;
 import com.pedromateus.zupacadey.MercadoLivre.usuario.Usuario;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -33,6 +37,10 @@ public class Produto {
 
     @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     private List<ImagensProduto> imagens=new ArrayList<>();
+
+
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Opiniao> opinioes= new ArrayList<>();
 
 
 
@@ -87,6 +95,17 @@ public class Produto {
 
     public void addImagens(List<ImagensProduto> imagem) {
         imagens.addAll(imagem);
+    }
+
+    public void addOpinao(OpiniaoRequestDTO opiniaoRequestDTO, Usuario usuarioDaOpiniao){
+        Opiniao opiniao= new Opiniao(
+                opiniaoRequestDTO.getNota(),
+                opiniaoRequestDTO.getTitulo(),
+                opiniaoRequestDTO.getDescricao(),
+                usuarioDaOpiniao,
+                this
+        );
+        this.opinioes.add(opiniao);
     }
 
 }
