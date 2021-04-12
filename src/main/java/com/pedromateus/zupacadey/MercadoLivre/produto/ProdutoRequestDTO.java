@@ -91,12 +91,5 @@ public class ProdutoRequestDTO {
         );
     }
 
-    public  static void salvarImagens(ImagensProdutoRequestDTO imagens,ProdutoRepository repository, Produto produto) throws IOException {
-        List<ImagensProduto> list = imagens.getImagens().stream()
-                .map(imagem -> new ImagensProduto(imagem.toString()))
-                .collect(Collectors.toList());
-        produto.addImagens(list);
-        repository.save(produto);
 
-    }
 }

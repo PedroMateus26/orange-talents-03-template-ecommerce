@@ -40,4 +40,15 @@ public class OpiniaoRequestDTO {
         return descricao;
     }
 
+    public Opiniao convertToOpiniao(OpiniaoRequestDTO opiniaoRequestDTO, Usuario usuarioDaOpiniao, Produto produto){
+        return new Opiniao(
+                opiniaoRequestDTO.getNota(),
+                opiniaoRequestDTO.getTitulo(),
+                opiniaoRequestDTO.getDescricao(),
+                usuarioDaOpiniao,
+                produto
+        );
+
+    }
+
 }

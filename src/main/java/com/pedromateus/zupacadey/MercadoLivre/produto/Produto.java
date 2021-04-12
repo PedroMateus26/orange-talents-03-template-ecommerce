@@ -8,8 +8,7 @@ import com.pedromateus.zupacadey.MercadoLivre.produto.perguntas.Pergunta;
 import com.pedromateus.zupacadey.MercadoLivre.produto.perguntas.PerguntasRequestDTO;
 import com.pedromateus.zupacadey.MercadoLivre.usuario.Usuario;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
+
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -98,27 +97,23 @@ public class Produto {
         return imagens;
     }
 
+    public List<Opiniao> getOpinioes() {
+        return opinioes;
+    }
+
+    public List<Pergunta> getPerguntas() {
+        return perguntas;
+    }
+
     public void addImagens(List<ImagensProduto> imagem) {
         imagens.addAll(imagem);
     }
 
-    public void addOpinao(OpiniaoRequestDTO opiniaoRequestDTO, Usuario usuarioDaOpiniao){
-        Opiniao opiniao= new Opiniao(
-                opiniaoRequestDTO.getNota(),
-                opiniaoRequestDTO.getTitulo(),
-                opiniaoRequestDTO.getDescricao(),
-                usuarioDaOpiniao,
-                this
-        );
+    public void addOpinao(Opiniao opiniao){
         this.opinioes.add(opiniao);
     }
 
-    public void addPergunta(PerguntasRequestDTO perguntaRequestDTO, Usuario usuarioDaOpiniao){
-        Pergunta pergunta= new Pergunta(
-                perguntaRequestDTO.getTitulo(),
-                usuarioDaOpiniao,
-                this
-        );
+    public void addPergunta(Pergunta pergunta){
         this.perguntas.add(pergunta);
     }
 

@@ -1,13 +1,17 @@
 package com.pedromateus.zupacadey.MercadoLivre.produto;
 
+import com.pedromateus.zupacadey.MercadoLivre.produto.imagens.ImagensProduto;
 import com.pedromateus.zupacadey.MercadoLivre.produto.imagens.ImagensProdutoRequestDTO;
+import com.pedromateus.zupacadey.MercadoLivre.produto.imagens.ImagensProdutoResponseDTO;
 import com.pedromateus.zupacadey.MercadoLivre.produto.opiniao.Opiniao;
 import com.pedromateus.zupacadey.MercadoLivre.produto.opiniao.OpiniaoRequestDTO;
+import com.pedromateus.zupacadey.MercadoLivre.produto.opiniao.OpiniaoResponseDTO;
+import com.pedromateus.zupacadey.MercadoLivre.produto.perguntas.EnviaEmailImplementacao;
+import com.pedromateus.zupacadey.MercadoLivre.produto.perguntas.Pergunta;
 import com.pedromateus.zupacadey.MercadoLivre.produto.perguntas.PerguntasRequestDTO;
 import com.pedromateus.zupacadey.MercadoLivre.usuario.UserService;
 import com.pedromateus.zupacadey.MercadoLivre.usuario.Usuario;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/products")
@@ -24,6 +30,9 @@ public class ProdutoController {
     private ProdutoRepository repository;
     private UserService userService;
     protected Usuario usuario;
+
+    @Autowired
+    private EnviaEmailImplementacao email;
 
     public ProdutoController(ProdutoRepository repository, UserService userService) {
         this.repository = repository;
@@ -41,9 +50,11 @@ public class ProdutoController {
     public ResponseEntity<?> cadastrandoImagens(@Valid ImagensProdutoRequestDTO imagens, @PathVariable Long id) throws IOException {
         Produto produto=repository.findById(id).orElseThrow(()->new EntityNotFoundException("Produto não encontrado"));
         Usuario usuario= userService.usuarioLogado();
-        if(usuario.getId()==produto.getUsuario().getId()) {
-            ProdutoRequestDTO.salvarImagens(imagens, repository, produto);
-            return ResponseEntity.ok().body("Imagens cadastrada com sucesso");
+        if(usuario.getId().equals(produto.getUsuario().getId())) {
+            List<ImagensProduto>list=imagens.salvarImagens();
+            produto.addImagens(list);
+            repository.save(produto);
+            return ResponseEntity.ok().body(new ImagensProdutoResponseDTO(list));
         }else{
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
@@ -56,9 +67,10 @@ public class ProdutoController {
         Long idProduto = id;
         Produto produto=repository.findById(idProduto).orElseThrow(()->new EntityNotFoundException("Produto não encontrado"));
         if(usuario!=null){
-            produto.addOpinao(opiniaoRequestDTO,usuario);
-            produto= repository.save(produto);
-            return ResponseEntity.ok().body(opiniaoRequestDTO);
+            Opiniao opiniao=opiniaoRequestDTO.convertToOpiniao(opiniaoRequestDTO,usuario, produto);
+            produto.addOpinao(opiniao);
+            repository.save(produto);
+            return ResponseEntity.ok().body(new OpiniaoResponseDTO(opiniao));
         }else{
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
@@ -72,12 +84,22 @@ public class ProdutoController {
         Long idProduto = id;
         Produto produto=repository.findById(idProduto).orElseThrow(()->new EntityNotFoundException("Produto não encontrado"));
         if(usuario!=null){
-            produto.addPergunta(pergutasRequestDTO,usuario);
-            produto= repository.save(produto);
+            System.out.println(email.enviaResposta(pergutasRequestDTO));
+            Pergunta pergunta=pergutasRequestDTO.convertToPergunta(usuario,produto);
+            produto.addPergunta(pergunta);
+            repository.save(produto);
             return ResponseEntity.ok().body(pergutasRequestDTO);
         }else{
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
+    }
+
+    @GetMapping("/{id}")
+    @Transactional
+    public ResponseEntity<?> retornaProduto(@PathVariable Long id){
+        Produto produto = repository.findById(id).orElseThrow(()->new EntityNotFoundException("Produto não econtrado na base de dados."));
+        ProdutoResponseDTO produtoProntoResponse=new ProdutoResponseDTO(produto);
+        return ResponseEntity.ok().body(produtoProntoResponse);
     }
 }
