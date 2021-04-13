@@ -1,5 +1,6 @@
 package com.pedromateus.zupacadey.MercadoLivre.exceptions;
 
+import com.pedromateus.zupacadey.MercadoLivre.exceptions.personalizadas.FormaPamentoInvalidaException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
@@ -35,6 +36,12 @@ public class ControllerExceptionHandler {
     @ExceptionHandler(BindException.class)
     public ResponseEntity<?> BindException(BindException e, HttpServletRequest http){
         StandardError error=new StandardError(Instant.now(),HttpStatus.BAD_REQUEST.value(),e.getFieldError().getDefaultMessage(), http.getRequestURI());
+        return ResponseEntity.status(error.getStatus()).body(error);
+    }
+
+    @ExceptionHandler(FormaPamentoInvalidaException.class)
+    public ResponseEntity<?> FormaPamentoInvalidaException(FormaPamentoInvalidaException e, HttpServletRequest http){
+        StandardError error=new StandardError(Instant.now(),HttpStatus.BAD_REQUEST.value(),e.getMessage(), http.getRequestURI());
         return ResponseEntity.status(error.getStatus()).body(error);
     }
 }

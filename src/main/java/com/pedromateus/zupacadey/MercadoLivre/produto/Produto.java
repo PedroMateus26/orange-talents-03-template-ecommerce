@@ -61,6 +61,10 @@ public class Produto {
         this.categoriaId = categoriaId;
     }
 
+    public Produto(Integer qtdRestante){
+        this.quantidade=qtdRestante;
+    }
+
     public Long getId() {
         return id;
     }
@@ -115,6 +119,11 @@ public class Produto {
 
     public void addPergunta(Pergunta pergunta){
         this.perguntas.add(pergunta);
+    }
+
+    public void subtraiProduto(Integer qtdCompradas){
+        Integer qtdProdutos=this.quantidade;
+        this.quantidade = Math.subtractExact(qtdProdutos,qtdCompradas);
     }
 
 }

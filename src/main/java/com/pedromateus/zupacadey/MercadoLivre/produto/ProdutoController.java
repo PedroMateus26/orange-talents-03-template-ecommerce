@@ -1,5 +1,10 @@
 package com.pedromateus.zupacadey.MercadoLivre.produto;
 
+import com.pedromateus.zupacadey.MercadoLivre.exceptions.personalizadas.FormaPamentoInvalidaException;
+import com.pedromateus.zupacadey.MercadoLivre.produto.compra.Compra;
+import com.pedromateus.zupacadey.MercadoLivre.produto.compra.CompraRepository;
+import com.pedromateus.zupacadey.MercadoLivre.produto.compra.CompraRequestDTO;
+import com.pedromateus.zupacadey.MercadoLivre.produto.compra.FormasDePagamento;
 import com.pedromateus.zupacadey.MercadoLivre.produto.imagens.ImagensProduto;
 import com.pedromateus.zupacadey.MercadoLivre.produto.imagens.ImagensProdutoRequestDTO;
 import com.pedromateus.zupacadey.MercadoLivre.produto.imagens.ImagensProdutoResponseDTO;
@@ -15,11 +20,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
+import javax.validation.constraints.AssertTrue;
 import java.io.IOException;
+import java.net.http.HttpClient;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,13 +38,15 @@ public class ProdutoController {
     private ProdutoRepository repository;
     private UserService userService;
     protected Usuario usuario;
+    private CompraRepository compraRepository;
 
     @Autowired
     private EnviaEmailImplementacao email;
 
-    public ProdutoController(ProdutoRepository repository, UserService userService) {
+    public ProdutoController(ProdutoRepository repository, UserService userService, CompraRepository compraRepository) {
         this.repository = repository;
         this.userService = userService;
+        this.compraRepository = compraRepository;
     }
 
     @PostMapping
@@ -102,4 +112,28 @@ public class ProdutoController {
         ProdutoResponseDTO produtoProntoResponse=new ProdutoResponseDTO(produto);
         return ResponseEntity.ok().body(produtoProntoResponse);
     }
-}
+
+    @Transactional
+    @PostMapping("/compra")
+    public ResponseEntity<?> realizarCompra(@RequestBody CompraRequestDTO compraRequestDTO){
+        Usuario usuario= userService.usuarioLogado();
+        try{
+            FormasDePagamento.metodoDePagamentoValido(compraRequestDTO.getFormaPagamento());
+        }catch (IllegalArgumentException e){
+            throw new FormaPamentoInvalidaException("Forma de pagamento não permitida");
+        }
+            Produto produto = repository.findById(compraRequestDTO.getId()).orElseThrow(() -> new EntityNotFoundException("Id do produto não consta na base de dados."));
+            if(compraRequestDTO.getQuantidade()>produto.getQuantidade()){
+                Assert.isTrue(compraRequestDTO.getQuantidade()>produto.getQuantidade(), "Não há produtos suficiente no estoque");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }else{
+                Compra compra = compraRequestDTO.convertToCompra(produto,usuario);
+                compraRepository.save(compra);
+                System.out.println(email.enviaResposta(compraRequestDTO));
+                return ResponseEntity.status(303).body(FormasDePagamento.valueOf(compraRequestDTO.getFormaPagamento()).gatwaysPagamento(compra));
+            }
+
+
+        }
+    }
+
