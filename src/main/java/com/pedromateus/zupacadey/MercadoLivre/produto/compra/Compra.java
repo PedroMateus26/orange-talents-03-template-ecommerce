@@ -1,11 +1,18 @@
 package com.pedromateus.zupacadey.MercadoLivre.produto.compra;
 
+import com.pedromateus.zupacadey.MercadoLivre.compraFinalizada.Transacao;
+import com.pedromateus.zupacadey.MercadoLivre.compraFinalizada.TransacaoRequest;
+import com.pedromateus.zupacadey.MercadoLivre.compraFinalizada.TrasacaoRequestPagSeguroDTO;
 import com.pedromateus.zupacadey.MercadoLivre.produto.Produto;
 import com.pedromateus.zupacadey.MercadoLivre.usuario.Usuario;
+import org.springframework.util.Assert;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 public class Compra {
@@ -21,6 +28,9 @@ public class Compra {
     private Produto produto;
     @ManyToOne
     private Usuario usuario;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    private Set<Transacao> transacoes=new HashSet<>();
 
     public Compra() {
     }
@@ -55,6 +65,14 @@ public class Compra {
 
     public Usuario getUsuario() {
         return usuario;
+    }
+
+    public void adicionaTransacao(TransacaoRequest transacaoRequest){
+        Transacao transacao=transacaoRequest.convertToTransacao(this);
+        Assert.isTrue(!this.transacoes.contains(transacao),"trasacao exestente");
+        transacoes.add(transacao);
+        this.transacoes.stream().filter(trasacao->transacao.estaConcluida(transacao)).collect(Collectors.toSet());
+        Assert.isTrue(!this.transacoes.isEmpty(),"Esta transação já foi concluida");
     }
 
 }
