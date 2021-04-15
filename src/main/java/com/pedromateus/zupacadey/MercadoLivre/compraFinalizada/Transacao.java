@@ -9,7 +9,7 @@ import java.time.Instant;
 @Entity
 public class Transacao {
     @Id
-    private Long id;
+    private String id;
     @ManyToOne
     private Compra compra;
     @CreationTimestamp
@@ -20,13 +20,13 @@ public class Transacao {
     public Transacao() {
     }
 
-    public Transacao(Long id, Compra compra, StatusTrasacao statusTrasacao) {
+    public Transacao(String id, Compra compra, StatusTrasacao statusTrasacao) {
         this.id = id;
         this.compra = compra;
         this.statusTrasacao = statusTrasacao;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 

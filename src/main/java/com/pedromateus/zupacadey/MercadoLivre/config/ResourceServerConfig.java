@@ -23,7 +23,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
     private TokenStore tokenStore;
 
     private static final String[] PUBLIC={"/oauth/token", "/h2-console/**"};
-    private static final String[] USUARIO={"/users/**","/products/**"};
+    private static final String[] USUARIO={"/users/**","/products/**", "/nota-fiscal/**", "/ranking/**","/retorno-pagseguro/**","/retorno-paypal/**"};
 
     @Override
     public void configure(ResourceServerSecurityConfigurer resources) throws Exception {

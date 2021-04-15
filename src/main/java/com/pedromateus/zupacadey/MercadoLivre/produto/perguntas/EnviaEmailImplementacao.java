@@ -4,16 +4,20 @@ import com.pedromateus.zupacadey.MercadoLivre.produto.compra.CompraRequestDTO;
 import org.springframework.stereotype.Component;
 
 @Component
-public class EnviaEmailImplementacao implements EnviaEmail{
+public class EnviaEmailImplementacao{
 
-    @Override
+
     public String enviaResposta(PerguntasRequestDTO pergunta) {
-        return "Nova mensagem recebida!";
+        return "Nova mensagem recebida! "+pergunta.getTitulo();
     }
 
-    @Override
+
     public String enviaResposta(CompraRequestDTO compra) {
-        return "Seu pagamento foi realizado com sucesso!";
+        return "Seu pagamento foi realizado com sucesso!"+ compra.getId();
+    }
+
+    public String enviaResposta() {
+        return "Sua compra foi concluida com sucesso!";
     }
 
 

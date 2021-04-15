@@ -69,10 +69,22 @@ public class Compra {
 
     public void adicionaTransacao(TransacaoRequest transacaoRequest){
         Transacao transacao=transacaoRequest.convertToTransacao(this);
-        Assert.isTrue(!this.transacoes.contains(transacao),"trasacao exestente");
+        Assert.isTrue(!this.transacoes.contains(transacao),"Trasacao existente");
+        Assert.isTrue(transacoesConcluidasComSucesso().isEmpty(),"Esta transação já foi concluida");
         transacoes.add(transacao);
-        this.transacoes.stream().filter(trasacao->transacao.estaConcluida(transacao)).collect(Collectors.toSet());
-        Assert.isTrue(!this.transacoes.isEmpty(),"Esta transação já foi concluida");
+
     }
 
+    private Set<Transacao> transacoesConcluidasComSucesso(){
+        Set<Transacao> transacoesConcluidasComSucesso = this.transacoes.stream()
+                .filter(transacao->transacao.estaConcluida(transacao))
+                .collect(Collectors.toSet());
+        Assert.isTrue(transacoesConcluidasComSucesso.size()<=1,"Trasacao concluida mais de uma vez para esse id");
+        return transacoesConcluidasComSucesso;
+    }
+
+
+    public boolean concluidaComSucesso() {
+        return !transacoesConcluidasComSucesso().isEmpty();
+    }
 }

@@ -2,18 +2,25 @@ package com.pedromateus.zupacadey.MercadoLivre.compraFinalizada;
 
 import com.pedromateus.zupacadey.MercadoLivre.produto.compra.Compra;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+
 public class TrasacaoRequestPayPalDTO implements TransacaoRequest{
 
-    private Long id;
+    @NotNull
+    private String idTransacao;
+    @Min(0)
+    @Max(1)
     private Integer statusTrasacao;
 
-    public TrasacaoRequestPayPalDTO(Long id, Integer statusTrasacao) {
-        this.id = id;
+    public TrasacaoRequestPayPalDTO(@NotNull String idTransacao, @Min(0) @Max(1) Integer statusTrasacao) {
+        this.idTransacao = idTransacao;
         this.statusTrasacao = statusTrasacao;
     }
 
-    public Long getId() {
-        return id;
+    public String getIdTransacao() {
+        return idTransacao;
     }
 
     public Integer getStatusTrasacao() {
@@ -23,10 +30,13 @@ public class TrasacaoRequestPayPalDTO implements TransacaoRequest{
     @Override
     public Transacao convertToTransacao(Compra compra) {
         return new Transacao(
-                this.id,
+                this.idTransacao,
                 compra,
                 PayPalEnum.normaliza(this.statusTrasacao)
-
         );
+    }
+
+    public  interface GatwaysDePagamento {
+        String gatwaysPagamento(Compra compra);
     }
 }

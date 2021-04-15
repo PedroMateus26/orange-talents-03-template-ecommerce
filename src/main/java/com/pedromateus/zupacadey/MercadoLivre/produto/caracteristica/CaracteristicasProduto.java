@@ -22,10 +22,6 @@ public class CaracteristicasProduto {
         this.descricao = descricao;
     }
 
-    public Long getId() {
-        return id;
-    }
-
     public String getNome() {
         return nome;
     }

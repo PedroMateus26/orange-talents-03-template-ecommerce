@@ -1,6 +1,8 @@
 package com.pedromateus.zupacadey.MercadoLivre.produto.compra;
 
-public enum FormasDePagamento implements GatwaysDePagamento{
+import com.pedromateus.zupacadey.MercadoLivre.compraFinalizada.TrasacaoRequestPayPalDTO;
+
+public enum FormasDePagamento implements TrasacaoRequestPayPalDTO.GatwaysDePagamento {
     PAYPAL("paypal"){
         @Override
         public String gatwaysPagamento(Compra compra) {

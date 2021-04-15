@@ -2,25 +2,37 @@ package com.pedromateus.zupacadey.MercadoLivre.produto;
 
 import com.pedromateus.zupacadey.MercadoLivre.produto.caracteristica.CaracteristicasProduto;
 import com.pedromateus.zupacadey.MercadoLivre.produto.imagens.ImagensProduto;
+import com.pedromateus.zupacadey.MercadoLivre.produto.opiniao.Opiniao;
 import com.pedromateus.zupacadey.MercadoLivre.produto.opiniao.OpiniaoResponseDTO;
 import com.pedromateus.zupacadey.MercadoLivre.produto.perguntas.Pergunta;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-public class ProdutoResponseDTO {
+public class ProdutoResponseDetalhesDTO {
 
     private String nome;
     private String descricao;
+    private Double media;
+    private Double notaTotal;
 
+    private List<OpiniaoResponseDTO> opinioes=new ArrayList<>();
     private List<CaracteristicasProduto> caracteristicasProdutos=new ArrayList<>();
+    private List<String> perguntas=new ArrayList<>();
+    private List<ImagensProduto> imagens=new ArrayList<>();
 
-
-    public ProdutoResponseDTO(Produto produto){
+    public ProdutoResponseDetalhesDTO(Produto produto){
         this.nome=produto.getNome();
         this.descricao=produto.getDescricao();
+        this.perguntas=listaPerguntas(produto);
+        this.opinioes=listaOpiniao(produto);
         this.caracteristicasProdutos=listaCaracteristicas(produto);
+        this.imagens=listaImagens(produto);
+        this.notaTotal=notaTotal(produto);
+        this.media=notaMedia(produto);
     }
 
     public String getNome() {
@@ -31,8 +43,24 @@ public class ProdutoResponseDTO {
         return descricao;
     }
 
+    public Double getMedia() {
+        return media;
+    }
+
+    public Double getNotaTotal() {
+        return notaTotal;
+    }
+
+    public List<OpiniaoResponseDTO> getOpinioes() {
+        return opinioes;
+    }
+
     public List<CaracteristicasProduto> getCaracteristicasProdutos() {
         return caracteristicasProdutos;
+    }
+
+    public List<String> getPerguntas() {
+        return perguntas;
     }
 
     private List<String> listaPerguntas(Produto produto){

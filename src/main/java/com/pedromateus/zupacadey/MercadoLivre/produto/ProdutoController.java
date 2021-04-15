@@ -25,11 +25,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
-import javax.validation.constraints.AssertTrue;
 import java.io.IOException;
-import java.net.http.HttpClient;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/products")
@@ -53,7 +50,7 @@ public class ProdutoController {
     public ResponseEntity<?> inserirPoduto(@RequestBody @Valid ProdutoRequestDTO requestDTO){
         Produto produto=requestDTO.convertToProduct(userService);
         produto=repository.save(produto);
-        return ResponseEntity.ok().body(produto);
+        return ResponseEntity.ok().body(new ProdutoResponseDTO(produto));
     }
 
     @PostMapping("/{id}/imagens")
@@ -109,7 +106,7 @@ public class ProdutoController {
     @Transactional
     public ResponseEntity<?> retornaProduto(@PathVariable Long id){
         Produto produto = repository.findById(id).orElseThrow(()->new EntityNotFoundException("Produto não econtrado na base de dados."));
-        ProdutoResponseDTO produtoProntoResponse=new ProdutoResponseDTO(produto);
+        ProdutoResponseDetalhesDTO produtoProntoResponse=new ProdutoResponseDetalhesDTO(produto);
         return ResponseEntity.ok().body(produtoProntoResponse);
     }
 

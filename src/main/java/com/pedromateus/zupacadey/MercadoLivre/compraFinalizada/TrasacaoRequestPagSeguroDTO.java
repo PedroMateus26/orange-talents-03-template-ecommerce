@@ -4,28 +4,28 @@ import com.pedromateus.zupacadey.MercadoLivre.produto.compra.Compra;
 
 
 public class TrasacaoRequestPagSeguroDTO implements TransacaoRequest{
-    private Long id;
-    private StatusTrasacao statusTrasacao;
+    private String idTransacao;
+    private PagSeguroEnum statusTrasacao;
 
-    public TrasacaoRequestPagSeguroDTO(Long id, PagSeguroEnum statusTrasacao) {
-        this.id = id;
-        this.statusTrasacao = statusTrasacao.normaliza();
+    public TrasacaoRequestPagSeguroDTO(String idTransacao, PagSeguroEnum statusTrasacao) {
+        this.idTransacao = idTransacao;
+        this.statusTrasacao = statusTrasacao;
     }
 
-    public Long getId() {
-        return id;
+    public String getIdTransacao() {
+        return idTransacao;
     }
 
-    public StatusTrasacao getStatusTrasacao() {
+    public PagSeguroEnum getStatusTrasacao() {
         return statusTrasacao;
     }
 
     @Override
     public Transacao convertToTransacao(Compra compra) {
         return new Transacao(
-                this.id,
+                this.idTransacao,
                 compra,
-                this.statusTrasacao
+                this.statusTrasacao.normaliza()
         );
     }
 }
